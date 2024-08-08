@@ -1,0 +1,17 @@
+name: images-api
+
+services:
+  api:
+    image: gabrielluciano/images-api:latest
+    restart: on-failure
+    environment:
+      API_PORT: '${API_PORT}'
+    ports:
+      - '3000:$API_PORT'
+    volumes:
+      - ${DATA_DIR}:/app/public
+    deploy:
+      resources:
+        limits:
+          cpus: 0.1
+          memory: '300MB'

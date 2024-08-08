@@ -4,7 +4,7 @@ import { error, json } from '../util/http';
 import { VALID_FILENAME_REGEX } from '../util/regex';
 import { sizes } from '../util/images';
 
-export async function uploadImage(req: Request, storagePath: string): Promise<Response> {
+export async function uploadImage(req: Request): Promise<Response> {
   const formData = await req.formData();
   const name = formData.get('name') as string;
   const file = formData.get('file') as Blob;
@@ -17,9 +17,7 @@ export async function uploadImage(req: Request, storagePath: string): Promise<Re
 
   let variants;
   try {
-    const variantsArray = await Promise.all(
-      sizes.map((size) => resize(buf, name, size, storagePath)),
-    );
+    const variantsArray = await Promise.all(sizes.map((size) => resize(buf, name, size)));
     variants = variantsArray.reduce((acc, obj) => {
       return { ...acc, ...obj };
     }, {});
@@ -31,13 +29,8 @@ export async function uploadImage(req: Request, storagePath: string): Promise<Re
   return json({ message: 'Image successfully uploaded', name, variants }, { status: 201 });
 }
 
-async function resize(
-  buf: ArrayBuffer,
-  name: string,
-  size: number,
-  storagePath: string,
-): Promise<Object> {
-  const filename = `${storagePath}/${name}-${size}w.webp`;
+async function resize(buf: ArrayBuffer, name: string, size: number): Promise<Object> {
+  const filename = `public/${name}-${size}w.webp`;
   await sharp(buf).resize({ width: size, position: 'center' }).toFile(filename);
   const key = `${size}`;
   const obj: any = {};
