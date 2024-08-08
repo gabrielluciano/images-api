@@ -13,7 +13,8 @@ const server = Bun.serve({
   async fetch(req: Request) {
     const url = new URL(req.url);
 
-    if (url.pathname == '/upload' && req.method == 'POST') return uploadImage(req, storagePath);
+    if (url.pathname == '/image/upload' && req.method == 'POST')
+      return uploadImage(req, storagePath);
 
     if (GET_IMAGE_PATH_REGEX.test(url.pathname) && req.method == 'GET')
       return getImage(url.pathname, storagePath);
